@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.PartidaJusta_Espelho.View.MenuSorteio"
+             BackgroundColor="White"
+             Title="Partida Justa"
+             >
+
+    <VerticalStackLayout
+        Spacing="15"
+        Padding="30,0"
+        VerticalOptions="Center">
+
+        <Image Source="imagem_sorteio.png"
+            HeightRequest="175"            
+            />
+
+        <Button
+           WidthRequest="250"
+            Text="Sortear Times"
+            TextColor="Green"
+            FontSize="18"
+            FontAttributes="Bold"
+            FontFamily="Alef"
+            BackgroundColor="White"
+            BorderColor="LightGreen"
+            CornerRadius="10"
+            BorderWidth="4"            
+            HorizontalOptions="Center"
+            Clicked="SorteioStatus"
+        />
+
+        <Button
+            WidthRequest="250"
+            Text="Lista de Times"
+            TextColor="Green"
+            FontSize="18"
+            FontAttributes="Bold"
+            FontFamily="Alef"
+            BackgroundColor="White"
+            BorderColor="LightGreen"
+            CornerRadius="10"
+            BorderWidth="4"            
+            HorizontalOptions="Center"
+            Clicked="MenuListaSorteio"
+        />
+
+    </VerticalStackLayout>
+
+
+</ContentPage>
+

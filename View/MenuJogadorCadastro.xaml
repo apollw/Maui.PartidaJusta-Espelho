@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.PartidaJusta_Espelho.View.MenuJogadorCadastro"
+             xmlns:viewmodels="clr-namespace:Maui.PartidaJusta_Espelho.ViewModel"
+             BackgroundColor="White"
+             Title="Cadastro de Jogadores"
+             Shell.TabBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <viewmodels:ViewModelJogador />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout
+        Spacing="25"
+        Padding="30,0"
+        VerticalOptions="Center">
+
+        <Image
+            WidthRequest="200"            
+            Source="imagem_cadastro.png"/>
+
+        <Entry
+            x:Name="_entryNome"
+<<<<<<< HEAD
+            Text="{Binding _entryNome}"
+            MaxLength="20"
+=======
+            Text="{Binding EntryNome}"
+            MaxLength="15"
+>>>>>>> 8963500108d8283c9b49f492a2e02e9336ef3fe2
+            WidthRequest="250"
+            BackgroundColor="WhiteSmoke"
+            PlaceholderColor="Gray"
+            Placeholder="Insira o Nome do Jogador"
+            ClearButtonVisibility="WhileEditing"
+            Keyboard="Default"
+        />
+
+        <Entry
+            x:Name="_entryTelefone"
+            Text="{Binding _entryTelefone}"
+            MaxLength="15"
+            WidthRequest="250"
+            BackgroundColor="WhiteSmoke"
+            PlaceholderColor="Gray"
+            Placeholder="Telefone: (XX) XXXXX-XXXX"             
+            Keyboard="Telephone"
+        />
+
+        <Label Text="{Binding Source={x:Reference _stepper}, Path=Value, StringFormat='Nota do Jogador: {0:F0}'}"
+               FontSize="Large"
+               TextColor="Green"
+               FontAttributes="Bold"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+
+        <Stepper x:Name="_stepper"
+                 WidthRequest="250"
+                 Value="{Binding _stepperValue}"
+                 Minimum="1"
+                 Maximum="5"                 
+                 Increment="1"
+                 BackgroundColor="White"                 
+                 HorizontalOptions="Center"                 
+        />
+
+        <Button
+            WidthRequest="250"
+            Text="Salvar"
+            TextColor="Green"
+            FontSize="18"
+            FontAttributes="Bold"
+            FontFamily="Alef"
+            BackgroundColor="White"
+            BorderColor="LightGreen"
+            CornerRadius="10"
+            BorderWidth="4"            
+            HorizontalOptions="Center"
+            Clicked="Button_Clicked"
+            
+        />
+
+    </VerticalStackLayout>
+
+</ContentPage>
+    
+
+

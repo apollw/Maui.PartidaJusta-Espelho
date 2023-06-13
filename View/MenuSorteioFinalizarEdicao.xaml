@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.PartidaJusta_Espelho.View.MenuSorteioFinalizarEdicao"
+             xmlns:viewmodels="clr-namespace:Maui.PartidaJusta_Espelho.ViewModel"
+             Title="Editar Time"
+             Shell.TabBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <viewmodels:ViewModelTime/>
+    </ContentPage.BindingContext>
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="10,0,10,0" Spacing="10">
+
+                <Grid Margin="0,5,0,5" RowDefinitions="Auto" ColumnDefinitions="33*,33*,33*">
+                    <Label Text="Nome"  FontAttributes="Bold" HorizontalTextAlignment="Start"  Grid.Row="0" Grid.Column="0" />
+                    <Label Text="Status" FontAttributes="Bold" HorizontalTextAlignment="End" Grid.Row="0" Grid.Column="3" />
+                </Grid>
+
+                <CollectionView ItemsSource="{Binding ListaCarregada}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Label Text="{Binding Nome}"/>
+                                <CheckBox x:Name="_checkBox" Color="Green" Grid.Row="1" Grid.Column="3" HorizontalOptions="End"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1"
+              Padding="5"
+              ColumnSpacing="10"
+              RowSpacing="10"
+              BackgroundColor="LightGreen">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="5" />
+            </Grid.RowDefinitions>
+
+            <Button Text="Checar Todos" Grid.Column="0" HorizontalOptions="Start" VerticalOptions="Start" WidthRequest="150" BackgroundColor="WhiteSmoke"
+                    TextColor="DarkSlateGray" />
+            <Button Text="Confirmar" Grid.Column="1" HorizontalOptions="End" VerticalOptions="Start" WidthRequest="150" BackgroundColor="WhiteSmoke"
+                    TextColor="DarkSlateGray" />
+
+        </Grid>
+    </Grid>
+
+</ContentPage>
+

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.PartidaJusta_Espelho.View.MenuSorteioLista"
+             xmlns:viewmodels="clr-namespace:Maui.PartidaJusta_Espelho.ViewModel"
+             Title="Times Sorteados"
+             Shell.TabBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <viewmodels:ViewModelTime />
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView VerticalScrollBarVisibility="Always">
+            <VerticalStackLayout>
+                <Grid RowDefinitions="25,Auto,*"
+                      ColumnDefinitions=".75*,.25*"
+                      Padding="10"
+                      RowSpacing="10"
+                      ColumnSpacing="10">
+
+                    <CollectionView Grid.Row="2" 
+                                    Grid.ColumnSpan="2"
+                                    ItemsSource="{Binding ListaCarregada}"
+                                    >
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <StackLayout Padding="5"
+                                             WidthRequest="350">
+                                    <Frame BorderColor="Gray"                                                    
+                                           Padding="20"
+                                           BackgroundColor="WhiteSmoke"
+                                           CornerRadius="0">
+
+                                        <StackLayout>
+                                            <Label   Text="{Binding Nome, StringFormat='{0}'}"
+                                                 FontSize="20"
+                                                 FontAttributes="Bold" />
+                                            <BoxView Color="Gray"
+                                                 HeightRequest="2"
+                                                 HorizontalOptions="Fill"/>
+
+                                            <!--Aqui ficam as informações dos jogadores de cada time-->
+                                            <StackLayout BindableLayout.ItemsSource="{Binding ListaJogador}">
+                                                <BindableLayout.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackLayout>
+                                                            <Label Text="{Binding Nome, StringFormat='{0}'}" />
+                                                        </StackLayout>
+                                                    </DataTemplate>
+                                                </BindableLayout.ItemTemplate>
+                                            </StackLayout>
+
+                                            <Button Text="Editar" 
+                                                FontSize="15"
+                                                HorizontalOptions="End"
+                                                Padding="0"
+                                                TextColor="Gray"
+                                                BackgroundColor="WhiteSmoke"
+                                                Clicked="Button_Clicked_1"/>
+
+                                        </StackLayout>
+
+                                    </Frame>
+                                </StackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+
+                </Grid>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1"
+              Padding="5"
+              ColumnSpacing="10"
+              RowSpacing="10"
+              BackgroundColor="LightGreen">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="5" />
+            </Grid.RowDefinitions>
+
+            <Button                 
+                WidthRequest="150"
+                Text="Retornar ao Início"
+                TextColor="DarkSlateGray"
+                FontSize="13"
+                FontFamily="Alef"
+                BackgroundColor="WhiteSmoke"
+                BorderColor="Black"
+                HorizontalOptions="Center"
+                Clicked="Button_Clicked"                
+            />
+        </Grid>
+
+    </Grid>
+
+
+</ContentPage>
+

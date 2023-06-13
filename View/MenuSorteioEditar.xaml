@@ -1,0 +1,92 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Maui.PartidaJusta_Espelho.ViewModel"
+             x:Class="Maui.PartidaJusta_Espelho.View.MenuSorteioEditar"
+             Title="Editar Time"
+             Shell.TabBarIsVisible="False">
+
+    <ContentPage.BindingContext>
+        <viewmodels:ViewModelTime/>
+    </ContentPage.BindingContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ScrollView>
+            <VerticalStackLayout Padding="10,0,10,0" Spacing="10">
+
+                <!-- Lista dos jogadores do primeiro time -->
+                <Grid Margin="0,5,0,5" RowDefinitions="Auto" ColumnDefinitions="33*,33*,33*">
+                    <Label Text="Nome" FontAttributes="Bold" HorizontalTextAlignment="Start" Grid.Row="0" Grid.Column="0" />
+                    <Label Text="Trocar" FontAttributes="Bold" HorizontalTextAlignment="End" Grid.Row="0" Grid.Column="3" />
+                </Grid>
+
+                <Label Text="Selecione os jogadores para a troca" HorizontalTextAlignment="Center"/>
+
+                <CollectionView x:Name="_collectionView" ItemsSource="{Binding ObjTimeParaEditar.ListaJogador}">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid RowSpacing="0" RowDefinitions="10,Auto,10,0.5" ColumnDefinitions="33*,33*,33*" VerticalOptions="FillAndExpand">
+                                <Label Text="{Binding Nome}" Grid.Row="1" Grid.Column="0" />
+                                <CheckBox x:Name="_checkBox" CheckedChanged="OnCheckBoxCheckedChanged" Color="Green" Grid.Row="1" Grid.Column="3" HorizontalOptions="End"/>
+                                <BoxView BackgroundColor="Black" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <Label Text="Selecione o time para realizar a troca" HorizontalTextAlignment="Center"/>
+                <CarouselView x:Name="_carouselView" ItemsSource="{Binding ListaCarregada}" Grid.Row="1">
+                    <CarouselView.ItemTemplate>
+                        <DataTemplate>
+                            <Frame BorderColor="Gray" Padding="20" BackgroundColor="WhiteSmoke" CornerRadius="0">
+                                <StackLayout>
+                                    <Label Text="{Binding Nome}" FontAttributes="Bold" HorizontalOptions="Center" />
+
+                                    <StackLayout BindableLayout.ItemsSource="{Binding ListaJogador}">
+                                        <BindableLayout.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!--<CheckBox Grid.Column="0" Color="Green" HorizontalOptions="End" />-->
+                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Color="Green" 
+                                                              CheckedChanged="OnCheckBoxCheckedChanged2" />
+
+                                                    <Label Grid.Column="1" Text="{Binding Nome}" HorizontalTextAlignment="Start" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </BindableLayout.ItemTemplate>
+                                    </StackLayout>
+                                </StackLayout>
+                            </Frame>
+                        </DataTemplate>
+                    </CarouselView.ItemTemplate>
+                </CarouselView>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Padding="5"
+              ColumnSpacing="10"
+              RowSpacing="10"
+              BackgroundColor="LightGreen"
+              Grid.Row="2">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="5" />
+            </Grid.RowDefinitions>
+
+            <Button Text="Confirmar" Grid.Column="1" HorizontalOptions="Center" VerticalOptions="Start" WidthRequest="150" BackgroundColor="WhiteSmoke"
+                    TextColor="DarkSlateGray" Clicked="TrocarJogadores"/>
+        </Grid>
+        
+    </Grid>
+</ContentPage>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="Maui.PartidaJusta_Espelho.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:Maui.PartidaJusta_Espelho.View"
+    BackgroundColor="LightGreen"
+    Shell.TabBarBackgroundColor="LightGreen"
+    Shell.TabBarUnselectedColor="Gray"
+    Shell.TabBarTitleColor="DarkGreen"    
+    >
+
+    <TabBar>
+        <Tab Title="Jogador" Icon="icon_jogador.png">
+            <ShellContent
+            ContentTemplate="{DataTemplate local:MenuJogadorEditar}"/>
+        </Tab>
+        <Tab Title="Time" Icon="icon_time.png">
+            <ShellContent
+            ContentTemplate="{DataTemplate local:MenuSorteio}"/>
+        </Tab>
+        <Tab Title="Partida" Icon="icon_partida.png">
+            <ShellContent
+            ContentTemplate="{DataTemplate local:MenuPartida}"/>
+        </Tab>
+    </TabBar>
+
+</Shell>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="Maui.PartidaJusta_Espelho.View.MenuSorteioJogadores"
+             xmlns:viewmodels="clr-namespace:Maui.PartidaJusta_Espelho.ViewModel"
+             Title="Sorteio de Times"
+             BackgroundColor="White"
+             Shell.TabBarIsVisible="False"
+             >
+
+    <ContentPage.BindingContext>
+        <viewmodels:ViewModelTime />
+    </ContentPage.BindingContext>
+
+    <VerticalStackLayout            
+            Spacing="25"
+            Padding="30,0"
+            VerticalOptions="Center">
+
+        <Image
+            WidthRequest="200"            
+            Source="imagem_sorteio.png"/>
+
+        <Label Text="{Binding Source={x:Reference _stepper}, Path=Value, StringFormat='Número de Jogadores: {0:F0}'}"
+               FontSize="Medium"
+               TextColor="Green"
+               HorizontalOptions="Center"
+               VerticalOptions="Center" />
+
+        <Stepper x:Name="_stepper"
+                 Minimum="2"
+                 Maximum="11"                 
+                 Increment="1"
+                 BackgroundColor="White"                 
+                 HorizontalOptions="Center"
+                 ValueChanged="OnStepperValueChanged"
+                 />
+
+        <Button             
+                WidthRequest="250"
+                Text="Iniciar Sorteio"
+                TextColor="Green"
+                FontSize="18"
+                FontAttributes="Bold"
+                FontFamily="Alef"
+                BackgroundColor="White"
+                BorderColor="LightGreen"
+                CornerRadius="10"
+                BorderWidth="4"            
+                HorizontalOptions="Center"
+                Clicked="SortearTimes"
+                Command="{Binding CmdSortearTimes}"
+         />
+
+    </VerticalStackLayout>
+
+
+
+
+
+</ContentPage>
+
+
+
+
+
