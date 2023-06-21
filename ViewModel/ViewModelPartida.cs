@@ -1,8 +1,8 @@
 ﻿using Maui.PartidaJusta_Espelho.Model;
+using System.Collections.ObjectModel;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,6 +15,10 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
     {
         public event PropertyChangedEventHandler PropertyChanged;
         private ModelPartida _objPartida;
+        private ModelTime _timeParaEdicao;
+        private List<ModelPartida> _listaPartida;
+        private ObservableCollection<ModelJogador> _listaDeJogadores;
+        private List<ModelJogador> _listaDeAdicao;
         private ObservableCollection<ModelTime> _listaDeTimes;
         private ObservableCollection<ModelTime> _listaDeTimesSuperior;
         private ObservableCollection<ModelTime> _listaDeTimesInferior;
@@ -31,6 +35,8 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
         private object _timeSelecionado2;
         private bool _podeRegistrarPartida = false;
         private bool _partidaRegistrada = false;
+        private bool _incompleto = false;
+
 
         #region
         //Declaração de Comandos Vinculados
@@ -42,24 +48,23 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
             _timer.Interval = TimeSpan.FromSeconds(1);
             _timer.Tick += OnTimerElapsed;
             ObjPartida = new ModelPartida();
+            TimeParaEdicao = new ModelTime();
+            ListaDeAdicao = new List<ModelJogador>();
+            ListaDeJogadores = new ObservableCollection<ModelJogador>(CarregarListaJogadores());
             ListaDeTimes = new ObservableCollection<ModelTime>(CarregarListaTimes());
-            ListaDeTimesSuperior = new ObservableCollection<ModelTime>();
-            ListaDeTimesInferior = new ObservableCollection<ModelTime>();
-
-            foreach (ModelTime element in ListaDeTimes)
-            {
-                if (ListaDeTimes.IndexOf(element) % 2 == 0)
-                {
-                    ListaDeTimesSuperior.Add(element);
-                }
-                else
-                    ListaDeTimesInferior.Add(element);
-            }
-
         }
 
         #region
         //Getters e Setters
+        public bool Incompleto
+        {
+            get => _incompleto;
+            set
+            {
+                _incompleto = value;
+                OnPropertyChanged(nameof(Incompleto));
+            }
+        }
         public ModelPartida ObjPartida
         {
             get => _objPartida;
@@ -67,6 +72,42 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
             {
                 _objPartida = value;
                 OnPropertyChanged(nameof(ObjPartida));
+            }
+        }
+        public ModelTime TimeParaEdicao
+        {
+            get => _timeParaEdicao;
+            set
+            {
+                _timeParaEdicao = value;
+                OnPropertyChanged(nameof(TimeParaEdicao));
+            }
+        }
+        public ObservableCollection<ModelJogador> ListaDeJogadores
+        {
+            get => _listaDeJogadores;
+            set
+            {
+                _listaDeJogadores = value;
+                OnPropertyChanged(nameof(ListaDeJogadores));
+            }
+        }
+        public List<ModelJogador> ListaDeAdicao
+        {
+            get => _listaDeAdicao;
+            set
+            {
+                _listaDeAdicao = value;
+                OnPropertyChanged(nameof(ListaDeAdicao));
+            }
+        }
+        public List<ModelPartida> ListaPartida
+        {
+            get => _listaPartida;
+            set
+            {
+                _listaPartida = value;
+                OnPropertyChanged(nameof(ListaPartida));
             }
         }
         public ObservableCollection<ModelTime> ListaDeTimes
@@ -210,6 +251,7 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
         }
         #endregion
 
+
         //PropertyChanged
         #region
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -217,31 +259,113 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
-
+        
         //Métodos Associados aos Commands
-        public void SalvarPartida()
+        public async void SalvarPartida()
         {
-            //Registrar os times selecionados nas CarouselView
-            var timesSelecionados = new List<ModelTime>();
-            foreach (var time in ListaDeTimes)
+            try
             {
-                if (TimeSelecionado1 == time)
+                PodeRegistrarPartida = true;
+                PartidaRegistrada = false;
+                //Registrar os times selecionados nas CarouselView
+                var timesSelecionados = new List<ModelTime>();
+                foreach (var time in ListaDeTimes)
                 {
-                    timesSelecionados.Add(time);
+                    if (TimeSelecionado1 == time)
+                    {
+                        timesSelecionados.Add(time);
+                    }
+                    if (TimeSelecionado2 == time)
+                    {
+                        timesSelecionados.Add(time);
+                    }
                 }
-                if (TimeSelecionado2 == time)
+                TimesSelecionados = timesSelecionados;
+
+                if (TimesSelecionados.Count == 0)
                 {
-                    timesSelecionados.Add(time);
+                    PodeRegistrarPartida = false;
+                    throw new Exception("Nenhum time registrado");
                 }
+
+                //Caso de times iguais
+                if (TimesSelecionados[0].Id == TimesSelecionados[1].Id)
+                {
+                    PodeRegistrarPartida = false;
+                    throw new Exception("Selecione times diferentes");
+                }
+
+                //Caso de times incompletos
+                foreach (ModelTime element in TimesSelecionados)
+                {
+                    ModelTime timeParaEdicao = new ModelTime();
+
+                    if (element.ListaJogador.Count < element.TotalJogadores)
+                    {
+                        timeParaEdicao = element;
+                        Incompleto = true;
+                        PodeRegistrarPartida = false;
+
+                        await App.Current.MainPage.DisplayAlert("Aviso", "Um dos times está incompleto", "Editar");
+                        break;
+                        //await App.Current.MainPage.Navigation.PushAsync(new MenuEdicaoTime(timeParaEdicao));                     
+                    }
+                }
+
+                //Finaliza a Partida
+                if (PodeRegistrarPartida)
+                {
+                    ObjPartida = new ModelPartida();
+                    ListaPartida = new List<ModelPartida>();
+
+                    ObjPartida.Id = 0;
+                    ObjPartida.Data = DateTime.Now;
+                    ObjPartida.TimeCasa = TimesSelecionados[0].Id;
+                    ObjPartida.TimeVisitante = TimesSelecionados[1].Id;
+                    ObjPartida.TimeCasaGols = Placar1;
+                    ObjPartida.TimeVisitanteGols = Placar2;
+
+                    if (Placar1 > Placar2)
+                        ObjPartida.TimeVencedor = TimesSelecionados[0].Id;
+                    else if (Placar2 > Placar1)
+                        ObjPartida.TimeVencedor = TimesSelecionados[1].Id;
+                    else
+                        ObjPartida.TimeVencedor = 0;
+
+                    // Verifica se o arquivo partidas.json existe
+                    var filePath = Path.Combine(FileSystem.AppDataDirectory, "partidas.json");
+                    if (File.Exists(filePath))
+                    {
+                        string json = File.ReadAllText(filePath);
+                        List<ModelPartida> partidas = new List<ModelPartida>();
+
+                        if (json != string.Empty)
+                        {
+                            partidas = JsonConvert.DeserializeObject<List<ModelPartida>>(json);
+                        }
+                        ListaPartida = partidas;
+                    }
+
+                    //ModelPartidaJogador modelPartidaJogador = new ModelPartidaJogador();
+                    //modelPartidaJogador.Partida = ObjPartida.Id;
+                    //modelPartidaJogador.Jogador = ObjPartida.
+
+                    ListaPartida.Add(ObjPartida);
+
+                    // Serializa a coleção ListaPartidas em uma string JSON
+                    string json2 = JsonConvert.SerializeObject(ListaPartida);
+                    // Salva a string JSON em um arquivo
+                    string filePath2 = Path.Combine(FileSystem.AppDataDirectory, "partidas.json");
+                    File.WriteAllText(filePath2, json2);
+
+                    PartidaRegistrada = true;
+                }
+
             }
-            TimesSelecionados = timesSelecionados;
-
-            //Registrar o placar exato da partida
-
-            //Finaliza a Partida
-            PodeRegistrarPartida = true;
-            PartidaRegistrada = true;
-
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", ex.Message, "Fechar");
+            }
 
         }
         public List<ModelTime> CarregarListaTimes()
@@ -261,18 +385,179 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
             }
             return times;
         }
+        public List<ModelJogador> CarregarListaJogadores()
+        {
+            List<ModelTime> times = new List<ModelTime>();
+            List<ModelJogador> jogadores = new List<ModelJogador>();
 
+            //Abre a lista de times sorteados
+            string filePath = Path.Combine(FileSystem.AppDataDirectory, "times.json");
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+
+                if (json != string.Empty)
+                    times = JsonConvert.DeserializeObject<List<ModelTime>>(json);
+
+                ListaDeTimes = new ObservableCollection<ModelTime>(times);
+
+                //Adicionar todos os jogadores da lista de times na lista jogadores
+                foreach (ModelTime element in ListaDeTimes)
+                {
+                    if (element.TotalJogadores == element.ListaJogador.Count)
+                        foreach (ModelJogador jogador in element.ListaJogador)
+                        {
+                            ModelJogador player = new ModelJogador();
+
+                            player.Id = jogador.Id;
+                            player.Nome = jogador.Nome;
+                            player.Telefone = jogador.Telefone;
+                            player.Status = jogador.Status;
+                            player.Posicao = jogador.Posicao;
+
+                            jogadores.Add(player);
+                        }
+                }
+
+            }
+
+            return jogadores;
+        }
         public void AtualizarListaCarregada()
         {
             ListaDeTimes = new ObservableCollection<ModelTime>(CarregarListaTimes());
+            ListaDeJogadores = new ObservableCollection<ModelJogador>(CarregarListaJogadores());
         }
-
-        public void StartTimer()
+        public async void EditarTime(ModelTime timeParaEditar)
         {
-            Time = TimeSpan.Zero;
-            _timer.Start();
-        }
+            bool _podeEditar = true;
+            int _numeroParaCompletar = timeParaEditar.TotalJogadores - timeParaEditar.ListaJogador.Count;
+            try
+            {
+                //Não pode Editar se o número for diferente dos que faltam para completar
+                if (ListaDeAdicao.Count != _numeroParaCompletar)
+                {
+                    _podeEditar = false;
+                    throw new Exception("Selecione o número correto de jogadores");
+                }
 
+                if (_podeEditar)
+                {
+                    List<ModelJogador> jogadoresAdicionados = new List<ModelJogador>();
+
+                    foreach (ModelTime element in ListaDeTimes)
+                    {
+                        if (element.Id != timeParaEditar.Id)
+                        {
+                            foreach (ModelJogador jogador in ListaDeAdicao)
+                            {
+                                ModelJogador jogadorExistente = element.ListaJogador.Find(j => j.Id == jogador.Id);
+                                if (jogadorExistente != null)
+                                {
+                                    //Remove do time origem
+                                    element.ListaJogador.RemoveAll(j => j.Id == jogador.Id);
+
+                                    ModelJogador jogadorTemp = new ModelJogador();
+
+                                    jogadorTemp.Id = jogadorExistente.Id;
+                                    jogadorTemp.Nome = jogadorExistente.Nome;
+                                    jogadorTemp.Telefone = jogadorExistente.Telefone;
+                                    jogadorTemp.Status = jogadorExistente.Status;
+                                    jogadorTemp.Nota = jogadorExistente.Nota;
+                                    jogadorTemp.Posicao = jogadorExistente.Posicao;
+
+                                    jogadoresAdicionados.Add(jogadorTemp);
+                                }
+                            }
+                        }
+                    }
+
+                    foreach (ModelTime element in ListaDeTimes)
+                    {
+                        //Após retirar os jogadores, adicinar todos ao time destino
+                        if (element.Id == timeParaEditar.Id)
+                        {
+                            element.ListaJogador.AddRange(jogadoresAdicionados);
+                        }
+
+                    }
+
+                    //Após mudar os times, salvar o novo arquivo JSON
+                    string json = JsonConvert.SerializeObject(ListaDeTimes);
+
+                    // Salva a string JSON em um arquivo
+                    string filePath = Path.Combine(FileSystem.AppDataDirectory, "times.json");
+                    File.WriteAllText(filePath, json);
+                }
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", ex.Message, "Fechar");
+            }
+        }
+        public async void StartTimer()
+        {
+            try
+            {
+                PodeRegistrarPartida = true;
+
+                //Registrar os times selecionados nas CarouselView
+                var timesSelecionados = new List<ModelTime>();
+                foreach (var time in ListaDeTimes)
+                {
+                    if (TimeSelecionado1 == time)
+                    {
+                        timesSelecionados.Add(time);
+                    }
+                    if (TimeSelecionado2 == time)
+                    {
+                        timesSelecionados.Add(time);
+                    }
+                }
+                TimesSelecionados = timesSelecionados;
+
+                if (TimesSelecionados.Count == 0)
+                {
+                    PodeRegistrarPartida = false;
+                    throw new Exception("Nenhum time registrado");
+                }
+
+                //Caso de times iguais
+                if (TimesSelecionados[0].Id == TimesSelecionados[1].Id)
+                {
+                    PodeRegistrarPartida = false;
+                    throw new Exception("Selecione times diferentes");
+                }
+
+                //Caso de times incompletos
+                foreach (ModelTime element in TimesSelecionados)
+                {
+                    ModelTime timeParaEdicao = new ModelTime();
+
+                    if (element.ListaJogador.Count < element.TotalJogadores)
+                    {
+                        timeParaEdicao = element;
+                        Incompleto = true;
+                        PodeRegistrarPartida = false;
+
+                        await App.Current.MainPage.DisplayAlert("Aviso", "Um dos times está incompleto", "Editar");
+                        await App.Current.MainPage.Navigation.PushAsync(new MenuEdicaoTime(timeParaEdicao));
+                    }
+                }
+
+                //Finaliza a Partida
+                if (PodeRegistrarPartida)
+                {
+                    //Se é uma Partida Válida, pode iniciar a contagem de tempo
+                    Time = TimeSpan.Zero;
+                    _timer.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                await App.Current.MainPage.DisplayAlert("Erro", ex.Message, "Fechar");
+            }
+        }
         public void StopTimer()
         {
             _timer.Stop();
@@ -286,8 +571,6 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
             Time = TimeSpan.Zero;
         }
 
-
-        //
-
     }
 }
+

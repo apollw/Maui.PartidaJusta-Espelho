@@ -13,21 +13,14 @@ using System.Windows.Input;
 
 namespace Maui.PartidaJusta_Espelho.ViewModel
 {
+
     public class ViewModelJogador : INotifyPropertyChanged
     {
-<<<<<<< HEAD
-=======
-        private ModelJogador objJogador;
-
-        private ObservableCollection<ModelJogador> _listaCarregada;
-
->>>>>>> 8963500108d8283c9b49f492a2e02e9336ef3fe2
         public event PropertyChangedEventHandler PropertyChanged;
         //A ViewModel se comunica com a View através de propriedades públicas
-        private bool _cadastroConcluido = false;
+        private bool _cadastroConcluido;
         private ModelJogador _objJogador;
         private ObservableCollection<ModelJogador> _listaCarregada;
-        private bool isLoading;
         public string _entryNome { get; set; }
         public string _entryTelefone { get; set; }
         public int _stepperValue { get; set; }
@@ -40,20 +33,11 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
         public ViewModelJogador()
         {
             ObjJogador = new ModelJogador();
-            ListaCarregada = new ObservableCollection<ModelJogador>(CarregarLista());
+            //ListaCarregada = new ObservableCollection<ModelJogador>();
+            ListaCarregada = CarregarLista();
         }
-        #region
-
         //Getters e Setters
-        public ObservableCollection<ModelJogador> ListaCarregada
-        {
-            get => _listaCarregada;
-            set
-            {
-                _listaCarregada = value;
-                OnPropertyChanged(nameof(ListaCarregada));
-            }
-        }
+        #region
         public ModelJogador ObjJogador
         {
             get => _objJogador;
@@ -61,6 +45,15 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
             {
                 _objJogador = value;
                 OnPropertyChanged(nameof(ObjJogador));
+            }
+        }
+        public ObservableCollection<ModelJogador> ListaCarregada
+        {
+            get => _listaCarregada;
+            set
+            {
+                _listaCarregada = value;
+                OnPropertyChanged(nameof(ListaCarregada));
             }
         }
         public bool CadastroConcluido
@@ -72,25 +65,15 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
                 OnPropertyChanged(nameof(CadastroConcluido));
             }
         }
-        public bool IsLoading
-        {
-            get { return isLoading; }
-            set
-            {
-                isLoading = value;
-                OnPropertyChanged(nameof(IsLoading));
-            }
-        }
         #endregion
-
-        #region
         //PropertyChanged
+        #region
+
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
-
         //Métodos Associados aos Commands
         public async void SalvarJogador()
         {
@@ -104,6 +87,7 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
                 bool isNomeEmpty = false;
                 bool isTelefoneEmpty = false;
                 bool isVerified = false;
+                CadastroConcluido = false;
 
                 if (string.IsNullOrEmpty(_entryNome))
                 {
@@ -129,18 +113,7 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
                 }
 
                 List<ModelJogador> listaTemp = new List<ModelJogador>();
-                var filePath = Path.Combine(FileSystem.AppDataDirectory, "jogadores.json");
-                if (File.Exists(filePath))
-                {
-                    string json = File.ReadAllText(filePath);
-                    List<ModelJogador> jogadores = new List<ModelJogador>();
-
-                    if (json != string.Empty)
-                        jogadores = JsonConvert.DeserializeObject<List<ModelJogador>>(json);
-
-                    listaTemp = jogadores;
-                }
-
+                listaTemp.AddRange(ListaCarregada);
                 //Verificar Telefone Repetido
                 foreach (ModelJogador element in listaTemp)
                 {
@@ -152,57 +125,58 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
                 }
 
                 bool isEdicao = false;
-                List<ModelJogador> listaEdicao = new List<ModelJogador>(listaTemp);
-                foreach (ModelJogador element in listaEdicao)
+                foreach (ModelJogador element in ListaCarregada)
                 {
                     if (element.Id == ObjJogador.Id && isVerified)
                     {
                         isEdicao = true;
-                        listaTemp.Remove(element);
-                        listaTemp.Add(ObjJogador);
+                        ListaCarregada.Remove(element);
+                        ListaCarregada.Add(ObjJogador);
 
-                        File.WriteAllText(filePath, JsonConvert.SerializeObject(listaTemp));
                         CadastroConcluido = true;
+                        break; // Saia do loop, já que encontramos o jogador a ser editado
                     }
                 }
 
                 if (isVerified && !isEdicao)
                 {
-                    List<ModelJogador> jogadoresParaAdicionar = new List<ModelJogador>(listaTemp);
-                    jogadoresParaAdicionar.Add(ObjJogador);
-                    File.WriteAllText(filePath, JsonConvert.SerializeObject(jogadoresParaAdicionar));
+
+                    ListaCarregada.Add(ObjJogador);
+
+                    //Salvar alterações no JSON
+                    var filePath = Path.Combine(FileSystem.AppDataDirectory, "jogadores.json");
+                    File.WriteAllText(filePath, JsonConvert.SerializeObject(ListaCarregada));
+                    //Exemplo de salvamento assíncrono usando System.IO.File.WriteAllText
+                    //string json = JsonConvert.SerializeObject(ListaCarregada);
+                    //await Task.Run(() => File.WriteAllText(filePath, json));
+
                     CadastroConcluido = true;
                 }
+
+
             }
             catch (Exception ex)
             {
                 await App.Current.MainPage.DisplayAlert("Erro", ex.Message, "Fechar");
             }
         }
-
-        public List<ModelJogador> CarregarLista()
+        public ObservableCollection<ModelJogador> CarregarLista()
         {
-            List<ModelJogador> jogadores = new List<ModelJogador>();
-
-            string filePath = Path.Combine(FileSystem.AppDataDirectory, "jogadores.json");
-            if (File.Exists(filePath))
+            if (ListaCarregada == null)
             {
-                string json = File.ReadAllText(filePath);
-
-                if (json != string.Empty)
-                    jogadores = JsonConvert.DeserializeObject<List<ModelJogador>>(json);
-
-                ListaCarregada = new ObservableCollection<ModelJogador>(jogadores);
-
+                ObservableCollection<ModelJogador> jogadores = new ObservableCollection<ModelJogador>();
+                string filePath = Path.Combine(FileSystem.AppDataDirectory, "jogadores.json");
+                if (File.Exists(filePath))
+                {
+                    string json = File.ReadAllText(filePath);
+                    if (json != string.Empty)
+                        jogadores = JsonConvert.DeserializeObject<ObservableCollection<ModelJogador>>(json);
+                }
+                return jogadores;
             }
-            return jogadores;
+            //Se não é a primeira vez, carregar a lista atual
+            return ListaCarregada;
         }
-
-        public void AtualizarListaCarregada()
-        {
-            ListaCarregada = new ObservableCollection<ModelJogador>(CarregarLista());
-        }
-
         private int GerarNovoId(int id)
         {
             if (id != 0)
@@ -223,11 +197,11 @@ namespace Maui.PartidaJusta_Espelho.ViewModel
                 }
             }
         }
-
+        public void AtualizarListaCarregada()
+        {
+            //ListaCarregada = new ObservableCollection<ModelJogador>(CarregarLista());
+        }
     }
-
 }
-
-
 
 

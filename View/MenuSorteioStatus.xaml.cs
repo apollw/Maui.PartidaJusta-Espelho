@@ -33,19 +33,11 @@ public partial class MenuSorteioStatus : ContentPage
         base.OnAppearing();
 
         // Atualizar os dados sempre que a p�gina for exibida
-        viewModelJogador.AtualizarListaCarregada();
+        // viewModelJogador.AtualizarListaCarregada();
 
         // Atualizar a exibi��o das checkboxes
         _collectionView.ItemsSource = viewModelJogador.ListaCarregada;
     }
-    //public void SelecionarTodos(object sender, EventArgs e)
-    //{
-    //    foreach (var jogador in viewModelJogador.ListaCarregada)
-    //    {
-    //        jogador.Status = 1;
-    //    }
-    //    AtualizarExibicaoCheckBoxes();
-    //}
     public void DesmarcarTodos(object sender, EventArgs e)
     {
         foreach (var jogador in viewModelJogador.ListaCarregada)
@@ -75,3 +67,4 @@ public partial class MenuSorteioStatus : ContentPage
     }
 
 }
+

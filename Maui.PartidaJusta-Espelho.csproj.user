@@ -12,6 +12,9 @@
     <PlatformTarget>arm64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <MauiXaml Update="MenuEdicaoTime.xaml">
+      <SubType>Designer</SubType>
+    </MauiXaml>
     <MauiXaml Update="View\MenuJogadorCadastro.xaml">
       <SubType>Designer</SubType>
     </MauiXaml>

@@ -22,19 +22,16 @@
 
         <Entry
             x:Name="_entryNome"
-<<<<<<< HEAD
             Text="{Binding _entryNome}"
             MaxLength="20"
-=======
-            Text="{Binding EntryNome}"
-            MaxLength="15"
->>>>>>> 8963500108d8283c9b49f492a2e02e9336ef3fe2
             WidthRequest="250"
             BackgroundColor="WhiteSmoke"
             PlaceholderColor="Gray"
             Placeholder="Insira o Nome do Jogador"
             ClearButtonVisibility="WhileEditing"
             Keyboard="Default"
+            Focused="_entryNome_Focused"
+            ReturnType="Done"
         />
 
         <Entry
@@ -44,8 +41,11 @@
             WidthRequest="250"
             BackgroundColor="WhiteSmoke"
             PlaceholderColor="Gray"
-            Placeholder="Telefone: (XX) XXXXX-XXXX"             
+            Placeholder="Telefone: (XX) XXXXX-XXXX"
+            ClearButtonVisibility="WhileEditing"
             Keyboard="Telephone"
+            Focused="_entryTelefone_Focused"
+            ReturnType="Done"
         />
 
         <Label Text="{Binding Source={x:Reference _stepper}, Path=Value, StringFormat='Nota do Jogador: {0:F0}'}"
@@ -66,6 +66,7 @@
         />
 
         <Button
+            x:Name="_btnSalvar"
             WidthRequest="250"
             Text="Salvar"
             TextColor="Green"
@@ -77,11 +78,13 @@
             CornerRadius="10"
             BorderWidth="4"            
             HorizontalOptions="Center"
-            Clicked="Button_Clicked"
+            Clicked="SavedButton"
             
         />
 
     </VerticalStackLayout>
+
+
 
 </ContentPage>
     

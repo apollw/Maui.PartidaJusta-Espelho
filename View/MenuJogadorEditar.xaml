@@ -15,10 +15,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
-        <ScrollView VerticalScrollBarVisibility="Always">
-            <VerticalStackLayout>
+        </Grid.RowDefinitions>        
+            
                 <Grid RowDefinitions="0,Auto,*"
                       ColumnDefinitions=".75*,.25*"
                       Padding="10"
@@ -68,6 +66,10 @@
                                                        FontSize="15"
                                                        HorizontalTextAlignment="Start"
                                                        />
+                                                <Label Text="{Binding Nota}"
+                                                       FontSize="15"
+                                                       HorizontalTextAlignment="Start"
+                                                       />
                                                 <Label Text="←Editar/Excluir" 
                                                        FontSize="15"
                                                        HorizontalOptions="End"                                                       
@@ -81,8 +83,8 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
                 </Grid>
-            </VerticalStackLayout>
-        </ScrollView>
+            
+        
 
         <Grid Grid.Row="1"
               Padding="5"
@@ -95,6 +97,8 @@
             </Grid.RowDefinitions>
 
             <Button 
+                    Text="Add"
+                     WidthRequest="75"
                      Grid.Row="1"
                      HorizontalOptions="End"
                      VerticalOptions="Start"
@@ -103,4 +107,6 @@
         </Grid>
     </Grid>
 
+
 </ContentPage>
+

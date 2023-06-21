@@ -7,14 +7,20 @@ namespace Maui.PartidaJusta_Espelho.View;
 
 public partial class MenuJogadorEditar : ContentPage
 {
-
     ViewModelJogador viewModel = new ViewModelJogador();
     public MenuJogadorEditar()
     {
         InitializeComponent();
         BindingContext = viewModel;
     }
+    private async void ImageButton_Clicked(object sender, EventArgs e)
+    {
+        //Limpar ObJogador caso jogador seja novo
+        viewModel.ObjJogador = new ModelJogador();
+        viewModel.CadastroConcluido = false;
+        await Navigation.PushAsync(new MenuJogadorCadastro(viewModel));
 
+    }
     async void OnDeleteSwipeItemInvoked(object sender, EventArgs e)
     {
         var swipeItem = sender as SwipeItem;
@@ -22,14 +28,11 @@ public partial class MenuJogadorEditar : ContentPage
 
         string message = "Deseja excluir " + item.Nome + "?";
 
-        bool confirmar = await DisplayAlert("Aviso", message, "Sim", "N�o");
+        bool confirmar = await DisplayAlert("Aviso", message, "Sim", "Nao");
 
         if (item != null && confirmar)
-        {
+        { 
             viewModel.ListaCarregada.Remove(item);
-            var filePath = Path.Combine(FileSystem.AppDataDirectory, "jogadores.json");
-            string json = JsonConvert.SerializeObject(viewModel.ListaCarregada);
-            File.WriteAllText(filePath, json);
         }
     }
 
@@ -39,28 +42,18 @@ public partial class MenuJogadorEditar : ContentPage
         var item = swipeItem.BindingContext as ModelJogador;
 
         viewModel.ObjJogador = item;
+        viewModel.CadastroConcluido= false;
 
-        //Passo a viewModel inteira como par�metro
+        //Passo a viewModel inteira como par�metro        
         await Navigation.PushAsync(new MenuJogadorCadastro(viewModel));
     }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        viewModel.AtualizarListaCarregada();
+        //BindingContext = viewModel;
+        viewModel.ListaCarregada = viewModel.CarregarLista();
     }
-
-    private bool isButtonClicked = false;
-    private async void ImageButton_Clicked(object sender, EventArgs e)
-    {
-        if (!isButtonClicked)
-        {
-            isButtonClicked = true;
-            await Navigation.PushAsync(new MenuJogadorCadastro());
-            // Aguardar a conclusao da navegacao
-            isButtonClicked = false;
-        }
-    }
-
 
 }
 
